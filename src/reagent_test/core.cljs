@@ -1,34 +1,46 @@
 (ns reaction-test.core
-  (:require [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as reagent ]
             [reagent.ratom :refer-macros [reaction run!]]))
-
-
-(def app-state (atom {:val 0 }))
 
 
 (enable-console-print!)
 
-(defn page1
-   []
-   (let [val (reaction (:val @app-state))]
-     (println "Here page1")
-     (when (< 100000 (:val @app-state)) 
-        (swap! app-state update-in [:val] inc))
-     [:div 
-        (str "Val: " @val)]))
+(def counter (reagent/atom 0))
+
+(defn inc-counter
+  []
+  (if (> 5000 @counter)
+     (swap! counter inc)))
 
 
+;; ----------------------
+
+(defn has-reaction1
+  []
+  (let [val      (reaction (+ 1 @counter -1))
+        val-str  (reaction (str @val))]
+    (fn []
+      (inc-counter)
+      [:div  @val-str])))
+
+
+(defn has-reaction2    ;; same as has-reaction1
+  []
+  (let [val      (reaction (+ 1 @counter -1))
+        val-str  (reaction (str @val))]
+    (fn []
+      (inc-counter)
+      [:div  @val-str])))
+
+
+;; ----------------------
 
 (defn page 
   []
-  [:div "hello"])
+  [:div "This counter will turn over about every 16ms (60 times a second) and stop at 5000: "
+   [(if (odd? @counter) has-reaction1 has-reaction2)]           ;; Thrash backwards and forwards
+  ])
 
 
-
-(defn pageX
-  []
-  [:div "hello"])
-
-
-(reagent/render [:div "hello"] (.getElementById js/document "app"))
+(reagent/render [page] (.getElementById js/document "app"))
 
