@@ -1,0 +1,14 @@
+.idea
+*.iml
+.nrepl-port
+pom.xml
+pom.xml.asc
+*.jar
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+.lein-failures
+out/
+target/
+compiled/
+
